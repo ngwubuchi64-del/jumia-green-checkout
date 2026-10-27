@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jumia Green Checkout Optimizer</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-orange: #f97316;
+            --accent-green: #22c55e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+        }
+
+        h2 {
+            color: var(--accent-orange);
+            margin-top: 0;
+            font-size: 24px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 12px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: var(--text-main);
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #475569; transition: .3s; border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--accent-green); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .summary-box {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .summary-row.total {
+            border-top: 1px dashed #475569;
+            padding-top: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--text-main);
+        }
+
+        .green-text { color: var(--accent-green); font-weight: bold; }
+        .orange-text { color: var(--accent-orange); font-weight: bold; }
+
+        .btn {
+            background-color: var(--accent-orange);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover { background-color: #ea580c; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Jumia Checkout Optimizer</h2>
+    
+    <div class="section">
+        <label for="location">Delivery Destination (Nigeria)</label>
+        <select id="location" onchange="calculateTotal()">
+            <option value="lagos">Lagos Mainland / Island</option>
+            <option value="abuja">Abuja FCT</option>
+            <option value="portharcourt">Port Harcourt</option>
+            <option value="ibadan">Ibadan</option>
+        </select>
+    </div>
+
+    <div class="section">
+        <label for="weight">Package Weight: <span id="weight-val">2</span> kg</label>
+        <input type="range" id="weight" min="1" max="20" value="2" oninput="updateWeight(this.value)">
+    </div>
+
+    <div class="section">
+        <div class="toggle-container">
+            <div>
+                <span style="font-weight: 600; display:block; font-size:14px;">Eco-Friendly Shipping</span>
+                <span style="font-size: 12px; color: var(--text-muted);">Offset carbon output (+₦500)</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="eco-toggle" onchange="calculateTotal()">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-row">
+            <span>Cart Items Subtotal:</span>
+            <span>₦25,000</span>
+        </div>
+        <div class="summary-row">
+            <span>Delivery Fee:</span>
+            <span id="delivery-fee">₦1,200</span>
+        </div>
+        <div class="summary-row">
+            <span>Carbon Offset:</span>
+            <span id="carbon-fee">₦0</span>
+        </div>
+        <div class="summary-row">
+            <span>Estimated Est. Arrival:</span>
+            <span id="arrival-time" class="orange-text">2-3 Days</span>
+        </div>
+        <div class="summary-row total">
+            <span>Total Payment:</span>
+            <span id="grand-total">₦26,200</span>
+        </div>
+    </div>
+
+    <button class="btn" onclick="alert('Order Dispatched via Green Route!')">Confirm & Pay</button>
+</div>
+
+<script>
+    function updateWeight(val) {
+        document.getElementById('weight-val').innerText = val;
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        const location = document.getElementById('location').value;
+        const weight = parseInt(document.getElementById('weight').value);
+        const isEco = document.getElementById('eco-toggle').checked;
+        
+        let baseDelivery = 1200;
+        let days = "2-3 Days";
+        
+        if (location === 'abuja') { baseDelivery = 2500; days = "4-5 Days"; }
+        else if (location === 'portharcourt') { baseDelivery = 2800; days = "4-6 Days"; }
+        else if (location === 'ibadan') { baseDelivery = 1500; days = "3-4 Days"; }
+        
+        const variableDelivery = baseDelivery + (weight * 150);
+        const carbonFee = isEco ? 500 : 0;
+        const total = 25000 + variableDelivery + carbonFee;
+        
+        document.getElementById('delivery-fee').innerText = "₦" + variableDelivery.toLocaleString();
+        document.getElementById('carbon-fee').innerText = "₦" + carbonFee.toLocaleString();
+        document.getElementById('arrival-time').innerText = days;
+        document.getElementById('grand-total').innerText = "₦" + total.toLocaleString();
+        
+        if(isEco) {
+            document.getElementById('arrival-time').className = "green-text";
+        } else {
+            document.getElementById('arrival-time').className = "orange-text";
+        }
+    }
+    
+    calculateTotal();
+</script>
+
+</body>
+</html>
